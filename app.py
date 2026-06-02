@@ -89,6 +89,20 @@ SYSTEM_PROMPT = """
 請像真的群友聊天。
 
 """
+SEARCH_KEYWORDS = [
+    "最新",
+    "今天",
+    "新聞",
+    "股價",
+    "賽程",
+    "比分",
+    "分組",
+    "演唱會",
+    "售票",
+    "門票",
+    "天氣",
+    "發售"
+]
 
 @app.route("/")
 def home():
@@ -175,7 +189,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(
-                text="確實，我失憶了 XD"
+                text="重製成功 !!"
             )
         )
 
@@ -274,15 +288,27 @@ def handle_message(event):
     messages.extend(chat_memory[room_id])
 
     try:
+        need_search = any(
+        word in user_text
+        for word in SEARCH_KEYWORDS
+        )
+        print(f"need_search = {need_search}")
+        print(f"user_text = {user_text}")
+        if need_search:
+            response = client.responses.create(
+                model="gpt-5.4-mini",
+                tools=[
+                    {
+                    "type": "web_search"
+                    }
+                ],
+            input=messages
+            )
+        else:
 
-        response = client.responses.create(
+            response = client.responses.create(
             model="gpt-5.4-mini",
-            tools=[
-                {
-                 "type": "web_search"
-                }
-            ],
-    input=messages
+            input=messages
         )
 
         reply_text = response.output_text
