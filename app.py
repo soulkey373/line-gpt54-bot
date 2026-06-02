@@ -281,7 +281,7 @@ def handle_message(event):
     )
 
     # 保留最近50則
-    chat_memory[room_id] = chat_memory[room_id][-50:]
+    chat_memory[room_id] = chat_memory[room_id][-10:]
 
     messages = [
         {
