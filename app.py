@@ -19,7 +19,33 @@ handler = WebhookHandler(
 client = OpenAI(
     api_key=os.environ["OPENAI_API_KEY"]
 )
+MODEL_NAME = "gpt-5.5"
 
+SEARCH_KEYWORDS = [
+    "最新",
+    "今天",
+    "新聞",
+    "股價",
+    "賽程",
+    "比分",
+    "戰況",
+    "分組",
+    "NBA",
+    "MLB",
+    "NHL",
+    "足球",
+    "棒球",
+    "籃球",
+    "馬刺",
+    "尼克",
+    "湖人",
+    "勇士",
+    "演唱會",
+    "售票",
+    "門票",
+    "天氣",
+    "發售"
+]
 chat_memory = defaultdict(list)
 
 SYSTEM_PROMPT = """
@@ -101,17 +127,38 @@ SEARCH_KEYWORDS = [
     "股價",
     "賽程",
     "比分",
+    "戰況",
     "分組",
+    "NBA",
+    "MLB",
+    "NHL",
+    "足球",
+    "棒球",
+    "籃球",
+    "馬刺",
+    "尼克",
+    "湖人",
+    "勇士",
     "演唱會",
     "售票",
     "門票",
     "天氣",
     "發售"
 ]
-
+SPORT_KEYWORDS = [
+    "NBA",
+    "MLB",
+    "馬刺",
+    "尼克",
+    "湖人",
+    "勇士",
+    "戰況",
+    "比分",
+    "賽程"
+]
 @app.route("/")
 def home():
-    return "GPT-5.4 Mini Bot Running"
+    return f"{MODEL_NAME} Bot Running"
 
 @app.route("/callback", methods=["POST"])
 def callback():
@@ -206,12 +253,12 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(
-                text=f"""📊 GPT 狀態
+            text=f"""📊 GPT 狀態
 
-記憶數量：{len(chat_memory[room_id])}
-模型：GPT-5.4 Mini
+            記憶數量：{len(chat_memory[room_id])}
+            模型：{MODEL_NAME}
 
-目前正常運作中 XD"""
+            目前正常運作中 XD"""
             )
         )
 
@@ -231,7 +278,7 @@ def handle_message(event):
         try:
 
             response = client.responses.create(
-                model="gpt-5.5",
+                model={MODEL_NAME},
                 input=[
                     {
                         "role": "system",
@@ -291,7 +338,29 @@ def handle_message(event):
     ]
 
     messages.extend(chat_memory[room_id])
+    is_sport = any(
+        word.lower() in user_text.lower()
+        for word in SPORT_KEYWORDS
+    )
 
+    if is_sport:
+        messages.append(
+        {
+            "role": "system",
+            "content": """
+你是專業體育記者。
+
+若今天沒有比賽：
+
+1. 查詢最近一場比賽結果
+2. 查詢下一場比賽時間
+3. 說明系列賽狀況
+4. 不要只回答 No games found
+5. 不要直接說查不到
+6. 使用繁體中文
+"""
+        }
+    )
     try:
         need_search = any(
         word in user_text
@@ -309,6 +378,11 @@ def handle_message(event):
                 ],
             input=messages
             )
+            print(f"MODEL = {MODEL_NAME}")
+            print(f"SEARCH = {need_search}")
+            print(f"SPORT = {is_sport}")
+            print(f"QUESTION = {user_text}")
+            print("=" * 50)
         else:
 
             response = client.responses.create(
