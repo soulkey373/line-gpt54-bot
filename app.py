@@ -21,31 +21,6 @@ client = OpenAI(
 )
 MODEL_NAME = "gpt-5.5"
 
-SEARCH_KEYWORDS = [
-    "最新",
-    "今天",
-    "新聞",
-    "股價",
-    "賽程",
-    "比分",
-    "戰況",
-    "分組",
-    "NBA",
-    "MLB",
-    "NHL",
-    "足球",
-    "棒球",
-    "籃球",
-    "馬刺",
-    "尼克",
-    "湖人",
-    "勇士",
-    "演唱會",
-    "售票",
-    "門票",
-    "天氣",
-    "發售"
-]
 chat_memory = defaultdict(list)
 
 SYSTEM_PROMPT = """
@@ -253,12 +228,12 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(
-            text=f"""📊 GPT 狀態
+text=f"""📊 GPT 狀態
 
-            記憶數量：{len(chat_memory[room_id])}
-            模型：{MODEL_NAME}
+記憶數量：{len(chat_memory[room_id])}
+模型：{MODEL_NAME}
 
-            目前正常運作中 XD"""
+目前正常運作中"""
             )
         )
 
@@ -370,7 +345,7 @@ def handle_message(event):
         print(f"user_text = {user_text}")
         if need_search:
             response = client.responses.create(
-                model="gpt-5.4-mini",
+                model={MODEL_NAME },
                 tools=[
                     {
                     "type": "web_search"
@@ -386,12 +361,12 @@ def handle_message(event):
         else:
 
             response = client.responses.create(
-            model="gpt-5.4-mini",
+            model=MODEL_NAME,
             input=messages
         )
 
         reply_text = response.output_text
-
+        print(response) 
         # GPT回覆加入記憶
         chat_memory[room_id].append(
             {
