@@ -19,7 +19,7 @@ handler = WebhookHandler(
 client = OpenAI(
     api_key=os.environ["OPENAI_API_KEY"]
 )
-MODEL_NAME = "gpt-5.5"
+MODEL_NAME = "gpt-5.4-mini"
 
 chat_memory = defaultdict(list)
 
