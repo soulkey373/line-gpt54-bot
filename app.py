@@ -253,7 +253,7 @@ text=f"""📊 GPT 狀態
         try:
 
             response = client.responses.create(
-                model={MODEL_NAME},
+                  model=MODEL_NAME,
                 input=[
                     {
                         "role": "system",
@@ -345,7 +345,7 @@ text=f"""📊 GPT 狀態
         print(f"user_text = {user_text}")
         if need_search:
             response = client.responses.create(
-                model={MODEL_NAME },
+                 model=MODEL_NAME,
                 tools=[
                     {
                     "type": "web_search"
