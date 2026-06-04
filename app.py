@@ -231,7 +231,7 @@ def handle_message(event):
         try:
 
             response = client.responses.create(
-                model="gpt-5.4-mini",
+                model="gpt-5.5",
                 input=[
                     {
                         "role": "system",
